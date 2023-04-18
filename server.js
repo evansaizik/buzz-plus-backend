@@ -5,7 +5,7 @@ const cors = require('cors');
 
 const io = require('socket.io')(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: 'https://buzz-plus-evansaizik.vercel.app',
     methods: ['GET', 'POST'],
   },
 });
