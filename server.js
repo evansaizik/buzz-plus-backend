@@ -1,6 +1,8 @@
 const app = require('express')();
+const dotenv = require('dotenv').config({path: './config.env'})
 const server = require('http').createServer(app);
 const cors = require('cors');
+const path = require('path');
 
 const io = require('socket.io')(server, {
   cors: {
@@ -11,7 +13,7 @@ const io = require('socket.io')(server, {
 
 app.use(cors());
 
-const PORT = 8080;
+const PORT = process.env.PORT || 80;
 
 app.get('/', (req, res) => res.send('server is running'));
 
