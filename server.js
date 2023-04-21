@@ -1,36 +1,41 @@
-const app = require('express')();
-const dotenv = require('dotenv').config({path: './config.env'})
-const server = require('http').createServer(app);
+const dotenv = require('dotenv').config({ path: './config.env' });
+const express = require('express');
+const app = express();
+const http = require('http');
 const cors = require('cors');
-const path = require('path');
+const { Server } = require('socket.io');
+app.use(cors());
 
-const io = require('socket.io')(server, {
+const PORT = process.env.PORT || 80;
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
   cors: {
     origin: '*',
     methods: ['GET', 'POST'],
   },
 });
 
-app.use(cors());
-
-const PORT = process.env.PORT || 80;
-
-app.get('/', (req, res) => res.send('server is running'));
-
 io.on('connection', (socket) => {
-  socket.emit('me', socket.id);
+  console.log(`User Connected: ${socket.id}`);
+
+  socket.on('join_room', (data) => {
+    socket.join(data);
+    console.log(`User with ID: ${socket.id} joined room: ${data}`);
+  });
+
+  socket.on('send_message', (data) => {
+    socket.to(data.room).emit('receive_message', data);
+  });
 
   socket.on('disconnect', () => {
-    socket.broadcast.emit('callended');
-  });
-
-  socket.on('calluser', ({ userToCall, signalData, from, name }) => {
-    io.to(userToCall).emit('calluser', { signal: signalData, from, name });
-  });
-
-  socket.on('answercall', (data) => {
-    io.to(data.to).emit('callaccepted', data.signal);
+    console.log('User Disconnected', socket.id);
   });
 });
 
-server.listen(PORT, () => console.log(`listening to request on port ${PORT}`));
+app.get('', (req, res) => res.send('<p>SERVER IS UP AND RUNNING</p>'));
+
+server.listen(PORT, () => {
+  console.log(`SERVER RUNNING ON PORT ${PORT}`);
+});
