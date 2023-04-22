@@ -23,6 +23,7 @@ io.on('connection', (socket) => {
 
   // messaging
   socket.on('join_room', (data) => {
+    const net = data
     socket.join(data);
     console.log(data, socket.id)
     console.log(`User with ID: ${socket.id} joined room: ${data}`);
@@ -33,7 +34,7 @@ io.on('connection', (socket) => {
       io.broadcast.emit('call_user', { signal: signalData, data, name });
     });
     socket.on('answer_call', (data) => {
-      io.broadcast.emit('call_accepted', data.signal);
+      io.to(net).emit('call_accepted', data.signal);
     });
     ///////////////////
   });
