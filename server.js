@@ -30,7 +30,7 @@ io.on('connection', (socket) => {
     // testing ////////////
     socket.on('call_user', ({ userToCall, signalData, from, name }) => {
       console.log('calling');
-      io.to(data).emit('call_user', { signal: signalData, data, name });
+      socket.broadcast.emit('call_user', { signal: signalData, data, name });
     });
     socket.on('answer_call', (data) => {
       io.emit('call_accepted', data.signal);
