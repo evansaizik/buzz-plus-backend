@@ -26,16 +26,6 @@ io.on('connection', (socket) => {
     socket.join(data);
     console.log(data, socket.id)
     console.log(`User with ID: ${socket.id} joined room: ${data}`);
-
-    // testing ////////////
-    socket.on('call_user', ({ userToCall, signalData, from, name }) => {
-      console.log('calling');
-      io.emit('call_user', { signal: signalData, data, name });
-    });
-    socket.on('answer_call', (data) => {
-      io.emit('call_accepted', data.signal);
-    });
-    ///////////////////
   });
 
   socket.on('send_message', (data) => {
@@ -44,14 +34,14 @@ io.on('connection', (socket) => {
 
   // video chat
 
-  // socket.on('call_user', ({userToCall, signalData, from, name}) => {
-  //   console.log('calling')
-  //   io.to(userToCall).emit('call_user', {signal: signalData, from, name})
-  // })
+  socket.on('call_user', ({userToCall, signalData, from, name}) => {
+    console.log('calling')
+    io.to(userToCall).emit('call_user', {signal: signalData, from, name})
+  })
 
-  // socket.on('answer_call', (data) => {
-  //   io.to(data.to).emit('call_accepted', data.signal)
-  // })
+  socket.on('answer_call', (data) => {
+    io.to(data.to).emit('call_accepted', data.signal)
+  })
 
   socket.on('disconnect', () => {
     console.log('User Disconnected', socket.id);
